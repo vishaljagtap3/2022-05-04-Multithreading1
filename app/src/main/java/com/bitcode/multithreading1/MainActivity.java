@@ -27,13 +27,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             //start a thread to download
-            new DownloadThread().execute((String) null);
+            String [] fileUrls = {
+                    "https://bitcode.in/files/android.pdf",
+                    "https://bitcode.in/files/ios.pdf",
+                    "https://bitcode.in/files/web.pdf",
+            };
+            //new DownloadThread().execute((String) null);
+            new DownloadThread().execute(fileUrls);
         }
     }
 
      private class DownloadThread extends AsyncTask<String, Integer, Float> {
 
         private ProgressDialog progressDialog;
+        //private String fileUrl = "https://bitcode.in/files/file1.pdf";
 
          @Override
          protected void onPreExecute() {
@@ -47,25 +54,44 @@ public class MainActivity extends AppCompatActivity {
          }
 
          @Override
-         protected Float doInBackground(String... input) {
+         protected Float doInBackground(String... fileUrls) {
 
-             for(int i = 0; i <= 100; i++) {
-                 Log.e("tag", i + " % ");
-                 progressDialog.setProgress(i);
-                 try {
-                     Thread.sleep(100);
-                 } catch (InterruptedException e) {
-                     e.printStackTrace();
+             for(String fileUrl : fileUrls) {
+
+                 progressDialog.setMessage("Downloading: " + fileUrl);
+
+                 for (int i = 0; i <= 100; i++) {
+                     //btnDownload.setText(i + "%"); //not allowed, never do this
+                     Log.e("tag", fileUrl + " " + i + " % ");
+
+                     Integer [] progress = new Integer[1];
+                     progress[0] = i;
+                     publishProgress(progress);
+
+                     progressDialog.setProgress(i);
+                     try {
+                         Thread.sleep(50);
+                     } catch (InterruptedException e) {
+                         e.printStackTrace();
+                     }
                  }
              }
 
-             return null;
+             return 12.12F;
+         }
+
+
+         @Override
+         protected void onProgressUpdate(Integer... values) {
+             super.onProgressUpdate(values);
+             btnDownload.setText("Progress " + values[0] + "%");
          }
 
          @Override
-         protected void onPostExecute(Float aFloat) {
-             super.onPostExecute(aFloat);
+         protected void onPostExecute(Float result) {
+             super.onPostExecute(result);
              progressDialog.dismiss();
+             btnDownload.setText("Result: " + result);
          }
      }
 }
